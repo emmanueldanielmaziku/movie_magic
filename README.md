@@ -1,16 +1,83 @@
-# movie_magic
+# Movie Streaming App 🎬
 
-A new Flutter project.
+A simple movie streaming app built with Flutter and Firebase, using The Movie Database (TMDb) API.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+✅ Google Authentication (Firebase)  
+✅ Browse popular movies from TMDb  
+✅ View movie details and actors  
+✅ Offline support using Hive  
+✅ Responsive UI inspired by Behance
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter**
+- **Firebase Authentication**
+- **TMDb API**
+- **Provider** (State Management)
+- **Hive** (Offline Storage)
+- **Dio / HTTP** (API Calls)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/emmanueldanielmaziku/movie_magic.git
+cd movie_magic
+```
+
+### 2. Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### 3. Set Up Firebase
+
+- Create a **Firebase project** in the [Firebase Console](https://console.firebase.google.com/).
+- Enable **Google Authentication**.
+- Download and add the **google-services.json** (Android) and **GoogleService-Info.plist** (iOS) to your project.
+
+### 4. Get TMDb API Key
+
+- Sign up at [TMDb](https://www.themoviedb.org/) and get an **API key**.
+- Add your API key to the app (inside an environment file or API service class).
+
+### 5. Run the App
+
+```bash
+flutter run
+```
+
+## Project Structure
+
+```
+📂 movie-magic/
+ ┣ 📂 lib/
+ ┃ ┣ 📂 screens/   # UI Screens (Home, Movie Details, Actor Details, etc.)
+ ┃ ┣ 📂 services/  # API Calls and Firebase Auth
+ ┃ ┣ 📂 models/    # Data Models (Movie, Actor, etc.)
+ ┃ ┣ 📂 providers/ # State Management (Provider)
+ ┃ ┗ 📜 main.dart  # Entry Point
+ ┣ 📂 assets/      # Images, icons, etc.
+ ┣ 📜 pubspec.yaml # Dependencies
+ ┗ 📜 README.md
+
+
+## Known Issues
+- The search feature is not yet implemented.
+- Some API requests may take longer due to rate limits.
+
+## Screenshots
+Screenshots will appear here , very sooon.
+
+---
+
+## Contributing
+Feel free to fork this repository and submit pull requests. Suggestions and improvements are welcome!
+
+## License
+This project is licensed under the **MIT License**.
+```
