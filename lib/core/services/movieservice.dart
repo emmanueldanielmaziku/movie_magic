@@ -1,24 +1,121 @@
 import 'package:dio/dio.dart';
+import 'package:movie_magic/core/utils/constants.dart';
+import 'package:movie_magic/models/cast.dart';
+import 'package:movie_magic/models/movie.dart';
+import 'package:movie_magic/models/reviews.dart';
 
 class MovieService {
-  static const String _apiKey =
-      "YOUR_TMDB_API_KEY"; // Replace with your actual API key
-  static const String _baseUrl = "https://api.themoviedb.org/3";
-  static final Dio _dio = Dio();
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: Constants.baseUrl,
+      headers: {
+        'Authorization': 'Bearer ${Constants.bearerToken}',
+        'accept': 'application/json',
+      },
+    ),
+  );
 
-  // Fetch trending movies
-  static Future<List<dynamic>> getTrendingMovies() async {
+  Future<List<Movie>> fetchTrendingMovies() async {
     try {
-      final response = await _dio.get("$_baseUrl/trending/movie/week",
-          queryParameters: {"api_key": _apiKey});
-
+      final response = await _dio.get(Constants.trendingMoviesEndpoint);
       if (response.statusCode == 200) {
-        return response.data['results'];
+        final List<dynamic> results = response.data['results'];
+        return results.map((json) => Movie.fromJson(json)).toList();
       } else {
-        throw Exception("Failed to load movies: ${response.statusMessage}");
+        throw Exception('Failed to load trending movies');
       }
     } catch (e) {
-      throw Exception("Error fetching movies: $e");
+      throw Exception('Error: $e');
+    }
+  }
+
+  //Movie Images
+  Future<List<String>> fetchMovieImages(int movieId) async {
+    try {
+      final response = await _dio.get(
+        Constants.movieImagesEndpoint
+            .replaceAll('{movie_id}', movieId.toString()),
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> backdrops = response.data['backdrops'];
+        return backdrops
+            .map((json) => json['file_path'])
+            .toList()
+            .cast<String>();
+      } else {
+        throw Exception('Failed to load movie images');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  //Movie Details
+  Future<Movie> fetchMovieDetails(int movieId) async {
+    try {
+      final response = await _dio.get(
+        Constants.movieDetailsEndpoint
+            .replaceAll('{movie_id}', movieId.toString()),
+      );
+      if (response.statusCode == 200) {
+        return Movie.fromJson(response.data);
+      } else {
+        throw Exception('Failed to load movie details');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  //Similar Movies
+  Future<List<Movie>> fetchSimilarMovies(int movieId) async {
+    try {
+      final response = await _dio.get(
+        Constants.similarMoviesEndpoint
+            .replaceAll('{movie_id}', movieId.toString()),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> results = response.data['results'];
+        return results.map((json) => Movie.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load similar movies');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  //cast and crew
+  Future<List<Cast>> fetchMovieCast(int movieId) async {
+    try {
+      final response = await _dio.get(
+        Constants.castCrewEndpoint.replaceAll('{movie_id}', movieId.toString()),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> castList = response.data['cast'];
+        return castList.map((json) => Cast.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load movie cast');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<Review>> fetchMovieReviews(int movieId) async {
+    try {
+      final response = await _dio.get(
+        Constants.movieReviewsEndpoint
+            .replaceAll('{movie_id}', movieId.toString()),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> results = response.data['results'];
+        return results.map((json) => Review.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load movie reviews');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
     }
   }
 }

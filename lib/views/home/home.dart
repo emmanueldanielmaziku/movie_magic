@@ -1,7 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:movie_magic/core/services/movieservice.dart';
 import 'package:movie_magic/models/movie.dart';
+import 'package:movie_magic/views/home/film.dart';
 import 'package:movie_magic/widgets/moviecard.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -15,29 +18,20 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final CarouselSliderController _controller = CarouselSliderController();
+  late Future<List<Movie>> _trendsmoviesFuture;
 
   final List<String> images = [
     'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe',
     'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe',
     'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe',
     'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe',
-    'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe',
   ];
 
-  final List<Movie> trendingNow = [
-    Movie(
-        title: 'Heart of Stone',
-        imageUrl:
-            'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe'),
-    Movie(
-        title: 'Wakanda Forever',
-        imageUrl:
-            'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe'),
-    Movie(
-        title: 'Love Again',
-        imageUrl:
-            'https://occ-0-8407-116.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABSnpnCU2Bb-QjJmTVcTU6gG57sYTE-q2UOx2GsLEjFX83tNvgxB5yFtpqyJQGAAB21o_O9VYKdOKPfxe7joIcWaMPhrF3YRfNNBP.jpg?r=afe'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _trendsmoviesFuture = MovieService().fetchTrendingMovies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +47,6 @@ class _HomeState extends State<Home> {
                     height: 320,
                     autoPlay: true,
                     viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    aspectRatio: 16 / 9,
-                    enableInfiniteScroll: true,
                     onPageChanged: (index, reason) {
                       setState(() {
                         _currentIndex = index;
@@ -63,115 +54,104 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   items: images.map((image) {
-                    return SingleChildScrollView(
-                      child: Stack(
-                        children: [
-                          Container(
-                            height: 320,
-                            margin: const EdgeInsets.symmetric(horizontal: 0.0),
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(0.0),
-                                  bottomRight: Radius.circular(0.0)),
-                              image: DecorationImage(
-                                image: NetworkImage(image),
-                                fit: BoxFit.cover,
-                              ),
+                    return Stack(
+                      children: [
+                        Container(
+                          height: 320,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(image),
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          Positioned(
-                            bottom: 60.0,
-                            left: 20.0,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  height: 30.0,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0, vertical: 5.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Iconsax.star1,
-                                        color: Colors.yellow,
-                                        size: 16.0,
-                                      ),
-                                      SizedBox(
-                                        width: 5.0,
-                                      ),
-                                      Text(
-                                        "9.5",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14.0),
-                                      )
-                                    ],
-                                  ),
+                        ),
+                        Positioned(
+                          bottom: 60.0,
+                          left: 20.0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 30.0,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0, vertical: 5.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(20.0),
                                 ),
-                                const SizedBox(
-                                  height: 8.0,
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Iconsax.star1,
+                                      color: Colors.yellow,
+                                      size: 16.0,
+                                    ),
+                                    SizedBox(
+                                      width: 5.0,
+                                    ),
+                                    Text(
+                                      "9.5",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 14.0),
+                                    )
+                                  ],
                                 ),
-                                const Text(
-                                  "Red Notice",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
+                              ),
+                              const SizedBox(
+                                height: 8.0,
+                              ),
+                              const Text(
+                                "Red Notice",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontSize: 30),
+                              ),
+                              const SizedBox(
+                                height: 8.0,
+                              ),
+                              Container(
+                                height: 30.0,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15.0, vertical: 5.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Text(
+                                      "Action",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 14.0),
+                                    ),
+                                    VerticalDivider(
                                       color: Colors.white,
-                                      fontSize: 30),
+                                      thickness: 0.6,
+                                    ),
+                                    Text(
+                                      "Adventure",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 14.0),
+                                    ),
+                                    VerticalDivider(
+                                      color: Colors.white,
+                                      thickness: 0.6,
+                                    ),
+                                    Text(
+                                      "Fantasy",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 14.0),
+                                    )
+                                  ],
                                 ),
-                                const SizedBox(
-                                  height: 8.0,
-                                ),
-                                Container(
-                                  height: 30.0,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15.0, vertical: 5.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: const Row(
-                                    children: [
-                                      Text(
-                                        "Action",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14.0),
-                                      ),
-                                      VerticalDivider(
-                                        color: Colors.white,
-                                        thickness: 0.6,
-                                      ),
-                                      Text(
-                                        "Adventure",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14.0),
-                                      ),
-                                      VerticalDivider(
-                                        color: Colors.white,
-                                        thickness: 0.6,
-                                      ),
-                                      Text(
-                                        "Fantasy",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14.0),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
                     );
                   }).toList(),
                 ),
@@ -185,7 +165,6 @@ class _HomeState extends State<Home> {
                       dotHeight: 8,
                       dotWidth: 8,
                       activeDotColor: Colors.white,
-                      dotColor: Color.fromARGB(255, 219, 219, 219),
                     ),
                     onDotClicked: (index) {
                       _controller.animateToPage(index);
@@ -224,11 +203,21 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
-            Column(
-              children: [
-                TrendMovieSection(title: 'Trending Now', movies: trendingNow),
-              ],
-            ),
+            FutureBuilder<List<Movie>>(
+              future: _trendsmoviesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No movies found'));
+                }
+
+                return TrendMovieSection(
+                    title: 'Trending Now', movies: snapshot.data!);
+              },
+            )
           ],
         ),
       ),
@@ -259,28 +248,33 @@ class TrendMovieSection extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 36, 20, 63),
+                  color: Color.fromARGB(255, 236, 236, 236),
                 ),
               ),
               IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Iconsax.arrow_right,
-                    color: Color.fromARGB(255, 36, 20, 63),
-                    size: 20.0,
-                  )),
+                onPressed: () {},
+                icon: const Icon(
+                  Iconsax.arrow_right,
+                  color: Color.fromARGB(255, 36, 20, 63),
+                  size: 20.0,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 200,
+            height: 250,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: movies.length,
               itemBuilder: (context, index) {
-                return MovieCard(movie: movies[index]);
+                return GestureDetector(
+                    onTap: () {
+                      Get.to(() => FilmDetails(movieId: movies[index].id));
+                    },
+                    child: MovieCard(movie: movies[index]));
               },
             ),
           ),

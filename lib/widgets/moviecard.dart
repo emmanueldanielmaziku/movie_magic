@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_magic/models/movie.dart';
@@ -10,33 +12,76 @@ class MovieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150,
-      height: 200,
-      color: Colors.grey[200],
-      margin: const EdgeInsets.only(right: 12),
-      child: Stack(children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            movie.imageUrl,
-            height: 200,
-            fit: BoxFit.cover,
+      width: 160,
+      margin: const EdgeInsets.symmetric(horizontal: 3.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child: Image.network(
+                  'https://image.tmdb.org/t/p/w500${movie.posterPath}',
+                  fit: BoxFit.cover,
+                  height: 220,
+                  width: 150,
+                ),
+              ),
+              Positioned(
+                bottom: 0.0,
+                left: 0.0,
+                right: 0.0,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(12.0),
+                    bottomRight: Radius.circular(12.0),
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    child: Container(
+                      height: 40.0,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 10.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          movie.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 5.0,
+                right: 5.0,
+                child: Container(
+                  height: 30.0,
+                  width: 30.0,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 3.0, vertical: 3.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50.0),
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.bookmark_fill,
+                    color: Colors.white,
+                    size: 18.0,
+                  ),
+                ),
+              )
+            ],
           ),
-        ),
-        Positioned(
-            top: 10,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: const Center(
-                child: Icon(CupertinoIcons.bookmark_solid),
-              ),
-            )),
-      ]),
+        ],
+      ),
     );
   }
 }
