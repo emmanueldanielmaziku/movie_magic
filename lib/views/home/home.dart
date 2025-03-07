@@ -25,6 +25,8 @@ class _HomeState extends State<Home> {
       MovieService().fetchNowPlayingMovies();
   late final Future<List<Movie>> _trendingMoviesFuture =
       MovieService().fetchTrendingMovies();
+  late final Future<List<Movie>> _upcomingMoviesFuture =
+      MovieService().fetchUpcomingMovies();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class _HomeState extends State<Home> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // Now Playing Movies Carousel
             FutureBuilder<List<NowPlaying>>(
               future: _nowPlayingMoviesFuture,
               builder: (context, snapshot) {
@@ -99,21 +102,17 @@ class _HomeState extends State<Home> {
                                           color: Colors.yellow,
                                           size: 16.0,
                                         ),
-                                        const SizedBox(
-                                          width: 5.0,
-                                        ),
+                                        const SizedBox(width: 5.0),
                                         Text(
                                           movie.voteAverage.toString(),
                                           style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 14.0),
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(
-                                    height: 8.0,
-                                  ),
+                                  const SizedBox(height: 8.0),
                                   Text(
                                     movie.title,
                                     style: const TextStyle(
@@ -121,9 +120,7 @@ class _HomeState extends State<Home> {
                                         color: Colors.white,
                                         fontSize: 30),
                                   ),
-                                  const SizedBox(
-                                    height: 8.0,
-                                  ),
+                                  const SizedBox(height: 8.0),
                                   Container(
                                     height: 30.0,
                                     padding: const EdgeInsets.symmetric(
@@ -153,7 +150,7 @@ class _HomeState extends State<Home> {
                                   ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         );
                       }).toList(),
@@ -192,14 +189,12 @@ class _HomeState extends State<Home> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Iconsax.video_play, color: Colors.white),
-                              SizedBox(
-                                width: 10.0,
-                              ),
+                              SizedBox(width: 10.0),
                               Text(
                                 "Watch Now",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16.0),
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -209,8 +204,11 @@ class _HomeState extends State<Home> {
                 );
               },
             ),
+
+            // Trending Movies Section
             Padding(
-              padding: const EdgeInsets.only(left: 16.0, top: 30.0),
+              padding: const EdgeInsets.only(
+                  left: 16.0, top: 30.0, bottom: 20.0, right: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -221,9 +219,8 @@ class _HomeState extends State<Home> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  // View All Button
-                  TextButton(
-                    onPressed: () {},
+                  GestureDetector(
+                    onTap: () {},
                     child: const Icon(
                       CupertinoIcons.chevron_right,
                       color: Colors.white,
@@ -237,6 +234,45 @@ class _HomeState extends State<Home> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return _buildShimmerTrendingMovies(); // Shimmer effect for trending movies
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No movies found'));
+                }
+
+                return TrendMovieSection(movies: snapshot.data!);
+              },
+            ),
+
+            // Upcoming Movies Section
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 16.0, top: 30.0, bottom: 20.0, right: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Upcoming Movies',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Icon(
+                      CupertinoIcons.chevron_right,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            FutureBuilder<List<Movie>>(
+              future: _upcomingMoviesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildShimmerTrendingMovies(); // Shimmer effect for upcoming movies
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -306,7 +342,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // Shimmer effect for the trending movies section
+  // Shimmer effect for the trending/upcoming movies section
   Widget _buildShimmerTrendingMovies() {
     return Shimmer.fromColors(
       baseColor: Colors.grey[850]!,
@@ -319,7 +355,7 @@ class _HomeState extends State<Home> {
           itemBuilder: (context, index) {
             return Container(
               width: 150,
-              margin: const EdgeInsets.only(right: 10),
+              margin: const EdgeInsets.only(left: 15),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.grey[850],

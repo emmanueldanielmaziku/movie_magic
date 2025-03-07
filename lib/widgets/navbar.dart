@@ -24,24 +24,47 @@ class NavBar extends StatelessWidget {
       unselectedItemColor: Colors.grey,
       showSelectedLabels: false,
       showUnselectedLabels: false,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Iconsax.home),
-          label: '',
+      items: [
+        _buildBottomNavigationBarItem(
+          icon: Iconsax.home,
+          index: 0,
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Iconsax.search_normal),
-          label: '',
+        _buildBottomNavigationBarItem(
+          icon: Iconsax.search_normal,
+          index: 1,
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Iconsax.save_2),
-          label: '',
+        _buildBottomNavigationBarItem(
+          icon: Iconsax.save_2,
+          index: 2,
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Iconsax.personalcard),
-          label: '',
+        _buildBottomNavigationBarItem(
+          icon: Iconsax.personalcard,
+          index: 3,
         ),
       ],
+    );
+  }
+
+  BottomNavigationBarItem _buildBottomNavigationBarItem({
+    required IconData icon,
+    required int index,
+  }) {
+    return BottomNavigationBarItem(
+      icon: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: InkResponse(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () {
+            onDestinationSelected(index);
+          },
+          child: Icon(
+            icon,
+            color: selectedIndex == index ? Colors.deepPurple : Colors.grey,
+          ),
+        ),
+      ),
+      label: '',
     );
   }
 }

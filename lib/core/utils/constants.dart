@@ -1,6 +1,7 @@
 class Constants {
   static const String baseUrl = 'https://api.themoviedb.org/3';
   static const String trendingMoviesEndpoint = '/trending/movie/day';
+  static const String upcomingMoviesEndpoint = '/movie/upcoming';
   static const String popularMoviesEndpoint = '/movie/popular';
   static const String movieImagesEndpoint = '/movie/{movie_id}/images';
   static const String actorImagesEndpoint = '/person/{person_id}/images';
