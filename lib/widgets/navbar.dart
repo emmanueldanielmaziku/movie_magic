@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -13,35 +14,28 @@ class NavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      backgroundColor: Colors.black,
-      type: BottomNavigationBarType.fixed,
-      currentIndex: selectedIndex,
-      onTap: (index) {
-        onDestinationSelected(index);
-      },
-      selectedItemColor: Colors.deepPurple,
-      unselectedItemColor: Colors.grey,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      items: [
-        _buildBottomNavigationBarItem(
-          icon: Iconsax.home,
-          index: 0,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.black.withOpacity(0.1), // Lower opacity
+          elevation: 0, // Remove shadow
+          type: BottomNavigationBarType.fixed,
+          currentIndex: selectedIndex,
+          onTap: onDestinationSelected,
+          selectedItemColor: Colors.deepPurple,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          items: [
+            _buildBottomNavigationBarItem(icon: Iconsax.home, index: 0),
+            _buildBottomNavigationBarItem(
+                icon: Iconsax.search_normal, index: 1),
+            _buildBottomNavigationBarItem(icon: Iconsax.save_2, index: 2),
+            _buildBottomNavigationBarItem(icon: Iconsax.personalcard, index: 3),
+          ],
         ),
-        _buildBottomNavigationBarItem(
-          icon: Iconsax.search_normal,
-          index: 1,
-        ),
-        _buildBottomNavigationBarItem(
-          icon: Iconsax.save_2,
-          index: 2,
-        ),
-        _buildBottomNavigationBarItem(
-          icon: Iconsax.personalcard,
-          index: 3,
-        ),
-      ],
+      ),
     );
   }
 
@@ -55,9 +49,7 @@ class NavBar extends StatelessWidget {
         child: InkResponse(
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
-          onTap: () {
-            onDestinationSelected(index);
-          },
+          onTap: () => onDestinationSelected(index),
           child: Icon(
             icon,
             color: selectedIndex == index ? Colors.deepPurple : Colors.grey,

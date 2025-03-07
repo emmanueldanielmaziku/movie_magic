@@ -8,6 +8,7 @@ import 'package:movie_magic/models/cast.dart';
 import 'package:movie_magic/models/movie.dart';
 import 'package:movie_magic/models/reviews.dart';
 import 'package:movie_magic/views/home/actor.dart';
+import 'package:movie_magic/views/home/home.dart';
 import 'package:movie_magic/widgets/moviecard.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -99,7 +100,7 @@ class _FilmDetailsState extends State<FilmDetails> {
                       left: 20.0,
                       child: GestureDetector(
                         onTap: () {
-                          Get.back();
+                          Get.offAll(() => const Home());
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -814,7 +815,7 @@ class RelatedMovies extends StatelessWidget {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
-                  Get.to(() => FilmDetails(movieId: movies[index].id));
+                  Get.offAll(() => FilmDetails(movieId: movies[index].id));
                 },
                 child: MovieCard(movie: movies[index]),
               );

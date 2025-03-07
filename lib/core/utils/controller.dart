@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:movie_magic/views/home/home.dart';
 import 'package:movie_magic/views/profile/profile.dart';
@@ -31,22 +29,16 @@ class _ControllerState extends State<Controller> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[selectedScreen],
-      bottomNavigationBar: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-          child: Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-                color: Colors.transparent,
-                border:
-                    Border(top: BorderSide(width: 0.5, color: Colors.grey))),
-            child: NavBar(
-              onDestinationSelected: (index) {
-                screenController(index);
-              },
-              selectedIndex: selectedScreen,
-            ),
-          ),
+      bottomNavigationBar: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+            color: Colors.transparent,
+            border: Border(top: BorderSide(width: 0.5, color: Colors.grey))),
+        child: NavBar(
+          onDestinationSelected: (index) {
+            screenController(index);
+          },
+          selectedIndex: selectedScreen,
         ),
       ),
     );
