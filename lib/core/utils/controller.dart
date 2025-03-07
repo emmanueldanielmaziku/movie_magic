@@ -16,8 +16,8 @@ class _ControllerState extends State<Controller> {
   int selectedScreen = 0;
   final List<Widget> _screens = [
     const Home(),
-    const Home(),
-    const Home(),
+    const Profile(),
+    const Profile(),
     const Profile(),
   ];
 

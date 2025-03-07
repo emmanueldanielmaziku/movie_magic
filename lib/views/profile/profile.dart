@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_magic/core/services/auth_service.dart';
 
@@ -13,7 +14,7 @@ class Profile extends StatelessWidget {
             AuthService().signOut();
           },
           child: const Icon(
-            Icons.logout,
+            CupertinoIcons.power,
             color: Colors.red,
           ),
         ),
