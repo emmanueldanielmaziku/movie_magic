@@ -46,12 +46,16 @@ class _FilmDetailsState extends State<FilmDetails> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[400]!,
+                    baseColor: Colors.grey[850]!,
+                    highlightColor: Colors.grey[800]!,
                     child: Container(
                       width: double.infinity,
                       height: 320,
-                      color: Colors.grey[600],
+                      decoration: BoxDecoration(
+                        color: Colors.grey[850]!,
+                        borderRadius:
+                            BorderRadius.circular(20.0), // Border radius
+                      ),
                     ),
                   );
                 } else if (snapshot.hasError) {
@@ -80,6 +84,7 @@ class _FilmDetailsState extends State<FilmDetails> {
                         return Container(
                           height: 320,
                           decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0),
                             image: DecorationImage(
                               image: NetworkImage(
                                   'https://image.tmdb.org/t/p/w780$imageUrl'),
@@ -333,12 +338,16 @@ class _FilmDetailsState extends State<FilmDetails> {
                       if (movieSnapshot.connectionState ==
                           ConnectionState.waiting) {
                         return Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[400]!,
+                          baseColor: Colors.grey[850]!,
+                          highlightColor: Colors.grey[800]!,
                           child: Container(
                             width: double.infinity,
                             height: 20,
-                            color: Colors.grey[600],
+                            decoration: BoxDecoration(
+                              color: Colors.grey[850],
+                              borderRadius:
+                                  BorderRadius.circular(10.0), // Border radius
+                            ),
                           ),
                         );
                       } else if (movieSnapshot.hasError) {
@@ -391,12 +400,16 @@ class _FilmDetailsState extends State<FilmDetails> {
                       if (movieSnapshot.connectionState ==
                           ConnectionState.waiting) {
                         return Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[400]!,
+                          baseColor: Colors.grey[850]!,
+                          highlightColor: Colors.grey[800]!,
                           child: Container(
                             width: double.infinity,
                             height: 20,
-                            color: Colors.grey[600],
+                            decoration: BoxDecoration(
+                              color: Colors.grey[850],
+                              borderRadius:
+                                  BorderRadius.circular(10.0), // Border radius
+                            ),
                           ),
                         );
                       } else if (movieSnapshot.hasError) {
@@ -439,12 +452,16 @@ class _FilmDetailsState extends State<FilmDetails> {
                       if (movieSnapshot.connectionState ==
                           ConnectionState.waiting) {
                         return Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[400]!,
+                          baseColor: Colors.grey[850]!,
+                          highlightColor: Colors.grey[800]!,
                           child: Container(
                             width: double.infinity,
                             height: 40,
-                            color: Colors.grey[600],
+                            decoration: BoxDecoration(
+                              color: Colors.grey[850],
+                              borderRadius:
+                                  BorderRadius.circular(20.0), // Border radius
+                            ),
                           ),
                         );
                       } else if (movieSnapshot.hasError) {
@@ -540,9 +557,7 @@ class _FilmDetailsState extends State<FilmDetails> {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(
-                            child:
-                                // Shimmer Loading Effect
-                                SizedBox(
+                            child: SizedBox(
                               height: 150.0,
                               child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
@@ -554,14 +569,14 @@ class _FilmDetailsState extends State<FilmDetails> {
                                       child: Column(
                                         children: [
                                           Shimmer.fromColors(
-                                            baseColor: Colors.grey[300]!,
-                                            highlightColor: Colors.grey[400]!,
+                                            baseColor: Colors.grey[850]!,
+                                            highlightColor: Colors.grey[800]!,
                                             child: Container(
                                               height: 80.0,
                                               width: 80.0,
                                               decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
-                                                color: Colors.grey[600],
+                                                color: Colors.grey[850],
                                               ),
                                             ),
                                           ),
@@ -648,12 +663,16 @@ class _FilmDetailsState extends State<FilmDetails> {
                       if (movieSnapshot.connectionState ==
                           ConnectionState.waiting) {
                         return Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[400]!,
+                          baseColor: Colors.grey[850]!,
+                          highlightColor: Colors.grey[800]!,
                           child: Container(
                             width: double.infinity,
                             height: 40,
-                            color: Colors.grey[600],
+                            decoration: BoxDecoration(
+                              color: Colors.grey[850],
+                              borderRadius:
+                                  BorderRadius.circular(20.0), // Border radius
+                            ),
                           ),
                         );
                       } else if (movieSnapshot.hasError) {

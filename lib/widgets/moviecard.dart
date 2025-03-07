@@ -40,7 +40,6 @@ class MovieCard extends StatelessWidget {
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                     child: Container(
-                      height: 40.0,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10.0, vertical: 10.0),
                       decoration: BoxDecoration(
