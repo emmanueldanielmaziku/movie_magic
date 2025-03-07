@@ -14,6 +14,8 @@ class MovieCard extends StatelessWidget {
     return Container(
       width: 160,
       margin: const EdgeInsets.symmetric(horizontal: 3.0),
+      decoration:
+          BoxDecoration(border: Border.all(width: 0.2, color: Colors.black12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
