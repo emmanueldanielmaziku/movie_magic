@@ -37,258 +37,321 @@ class _FilmDetailsState extends State<FilmDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<Movie>(
-        future: _movieDetailsFuture,
-        builder: (context, movieSnapshot) {
-          if (movieSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CupertinoActivityIndicator(
-                radius: 15.0,
-              ),
-            );
-          } else if (movieSnapshot.hasError) {
-            return Center(
-              child: Text('Error: ${movieSnapshot.error}'),
-            );
-          } else if (!movieSnapshot.hasData) {
-            return const Center(child: Text('No movie details found'));
-          }
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Carousel Section
+            FutureBuilder<List<String>>(
+              future: images,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[400]!,
+                    child: Container(
+                      width: double.infinity,
+                      height: 320,
+                      color: Colors.grey[600],
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No images found'));
+                }
 
-          final movie = movieSnapshot.data!;
+                final imageUrls = snapshot.data!;
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                // Carousel Section
-                FutureBuilder<List<String>>(
-                  future: images,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[400]!,
-                        child: Container(
-                          width: double.infinity,
+                return Stack(
+                  children: [
+                    CarouselSlider(
+                      carouselController: _controller,
+                      options: CarouselOptions(
+                        height: 320,
+                        autoPlay: true,
+                        viewportFraction: 1.0,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                      ),
+                      items: imageUrls.map((imageUrl) {
+                        return Container(
                           height: 320,
-                          color: Colors.grey[600],
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No images found'));
-                    }
-
-                    final imageUrls = snapshot.data!;
-
-                    return Stack(
-                      children: [
-                        CarouselSlider(
-                          carouselController: _controller,
-                          options: CarouselOptions(
-                            height: 320,
-                            autoPlay: true,
-                            viewportFraction: 1.0,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                _currentIndex = index;
-                              });
-                            },
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                  'https://image.tmdb.org/t/p/w780$imageUrl'),
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          items: imageUrls.map((imageUrl) {
-                            return Container(
-                              height: 320,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://image.tmdb.org/t/p/w780$imageUrl'),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        Positioned(
-                          top: 30.0,
-                          left: 20.0,
-                          child: GestureDetector(
-                            onTap: () {
-                              Get.back();
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Center(
-                                  child: Icon(
-                                    CupertinoIcons.back,
-                                    color: Colors.white,
-                                    size: 22.0,
-                                  ),
-                                ),
+                        );
+                      }).toList(),
+                    ),
+                    Positioned(
+                      top: 30.0,
+                      left: 20.0,
+                      child: GestureDetector(
+                        onTap: () {
+                          Get.back();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Icon(
+                                CupertinoIcons.back,
+                                color: Colors.white,
+                                size: 22.0,
                               ),
                             ),
                           ),
                         ),
-                        Positioned(
-                          right: 20.0,
-                          bottom: 60.0,
-                          child: AnimatedSmoothIndicator(
-                            activeIndex: _currentIndex,
-                            count: 5,
-                            effect: const WormEffect(
-                              dotHeight: 8,
-                              dotWidth: 8,
-                              activeDotColor: Colors.white,
-                            ),
-                            onDotClicked: (index) {
-                              _controller.animateToPage(index);
-                            },
-                          ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 20.0,
+                      bottom: 60.0,
+                      child: AnimatedSmoothIndicator(
+                        activeIndex: _currentIndex,
+                        count: 5,
+                        effect: const WormEffect(
+                          dotHeight: 8,
+                          dotWidth: 8,
+                          activeDotColor: Colors.white,
                         ),
-                        Positioned(
-                          bottom: 60.0,
-                          left: 20.0,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 30.0,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15.0, vertical: 5.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(20.0),
+                        onDotClicked: (index) {
+                          _controller.animateToPage(index);
+                        },
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 60.0,
+                      left: 20.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 30.0,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15.0, vertical: 5.0),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Iconsax.star1,
+                                  color: Colors.yellow,
+                                  size: 16.0,
                                 ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Iconsax.star1,
-                                      color: Colors.yellow,
-                                      size: 16.0,
-                                    ),
-                                    const SizedBox(width: 5.0),
-                                    Text(
+                                const SizedBox(width: 5.0),
+                                FutureBuilder<Movie>(
+                                  future: _movieDetailsFuture,
+                                  builder: (context, movieSnapshot) {
+                                    if (movieSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Text(
+                                        "Loading...",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.0),
+                                      );
+                                    } else if (movieSnapshot.hasError) {
+                                      return Text(
+                                        'Error: ${movieSnapshot.error}',
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.0),
+                                      );
+                                    } else if (!movieSnapshot.hasData) {
+                                      return const Text(
+                                        'No data',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.0),
+                                      );
+                                    }
+
+                                    final movie = movieSnapshot.data!;
+
+                                    return Text(
                                       "${movie.voteAverage}",
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 14.0),
-                                    ),
-                                    const VerticalDivider(
-                                      color: Colors.white,
-                                      thickness: 0.6,
-                                    ),
-                                    Text(
+                                    );
+                                  },
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.white,
+                                  thickness: 0.6,
+                                ),
+                                FutureBuilder<Movie>(
+                                  future: _movieDetailsFuture,
+                                  builder: (context, movieSnapshot) {
+                                    if (movieSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Text(
+                                        "Loading...",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.0),
+                                      );
+                                    } else if (movieSnapshot.hasError) {
+                                      return Text(
+                                        'Error: ${movieSnapshot.error}',
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.0),
+                                      );
+                                    } else if (!movieSnapshot.hasData) {
+                                      return const Text(
+                                        'No data',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.0),
+                                      );
+                                    }
+
+                                    final movie = movieSnapshot.data!;
+
+                                    return Text(
                                       movie.releaseDate.substring(0, 4), // Year
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 14.0),
-                                    ),
-                                    const VerticalDivider(
-                                      color: Colors.white,
-                                      thickness: 0.6,
-                                    ),
-                                    const Text(
-                                      "+12",
+                                    );
+                                  },
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.white,
+                                  thickness: 0.6,
+                                ),
+                                const Text(
+                                  "+12",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14.0),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      right: 20.0,
+                      left: 20.0,
+                      bottom: 5.0,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 119, 22, 212),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20.0),
+                                    bottomLeft: Radius.circular(20.0),
+                                  ),
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: const Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Iconsax.play, color: Colors.white),
+                                    SizedBox(width: 10.0),
+                                    Text(
+                                      "Watch Now",
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 14.0),
-                                    ),
+                                          color: Colors.white, fontSize: 16.0),
+                                    )
                                   ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                        Positioned(
-                          right: 20.0,
-                          left: 20.0,
-                          bottom: 5.0,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 119, 22, 212),
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(20.0),
-                                        bottomLeft: Radius.circular(20.0),
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed: () {},
-                                  child: const Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Iconsax.play, color: Colors.white),
-                                        SizedBox(width: 10.0),
-                                        Text(
-                                          "Watch Now",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16.0),
-                                        )
-                                      ],
-                                    ),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 240, 240, 240),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(20.0),
+                                    bottomRight: Radius.circular(20.0),
                                   ),
                                 ),
                               ),
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(
-                                        255, 240, 240, 240),
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(20.0),
-                                        bottomRight: Radius.circular(20.0),
-                                      ),
+                              onPressed: () {},
+                              child: const Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Iconsax.video_play,
+                                      color: Color.fromARGB(255, 119, 22, 212),
                                     ),
-                                  ),
-                                  onPressed: () {},
-                                  child: const Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Iconsax.video_play,
+                                    SizedBox(width: 10.0),
+                                    Text(
+                                      "Watch Trailer",
+                                      style: TextStyle(
                                           color:
                                               Color.fromARGB(255, 119, 22, 212),
-                                        ),
-                                        SizedBox(width: 10.0),
-                                        Text(
-                                          "Watch Trailer",
-                                          style: TextStyle(
-                                              color: Color.fromARGB(
-                                                  255, 119, 22, 212),
-                                              fontSize: 16.0),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                          fontSize: 16.0),
+                                    )
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                // Movie Details Section
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Genres and Runtime
-                      Row(
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            // Movie Details Section
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Genres and Runtime
+                  FutureBuilder<Movie>(
+                    future: _movieDetailsFuture,
+                    builder: (context, movieSnapshot) {
+                      if (movieSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[400]!,
+                          child: Container(
+                            width: double.infinity,
+                            height: 20,
+                            color: Colors.grey[600],
+                          ),
+                        );
+                      } else if (movieSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${movieSnapshot.error}'));
+                      } else if (!movieSnapshot.hasData) {
+                        return const Center(
+                            child: Text('No movie details found'));
+                      }
+
+                      final movie = movieSnapshot.data!;
+
+                      return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
@@ -316,11 +379,37 @@ class _FilmDetailsState extends State<FilmDetails> {
                             style: const TextStyle(color: Colors.white),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 10.0),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10.0),
 
-                      // Title & Overview
-                      Column(
+                  // Title & Overview
+                  FutureBuilder<Movie>(
+                    future: _movieDetailsFuture,
+                    builder: (context, movieSnapshot) {
+                      if (movieSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[400]!,
+                          child: Container(
+                            width: double.infinity,
+                            height: 20,
+                            color: Colors.grey[600],
+                          ),
+                        );
+                      } else if (movieSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${movieSnapshot.error}'));
+                      } else if (!movieSnapshot.hasData) {
+                        return const Center(
+                            child: Text('No movie details found'));
+                      }
+
+                      final movie = movieSnapshot.data!;
+
+                      return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -338,11 +427,37 @@ class _FilmDetailsState extends State<FilmDetails> {
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 30.0),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 30.0),
 
-                      // Interaction Buttons
-                      Row(
+                  // Interaction Buttons
+                  FutureBuilder<Movie>(
+                    future: _movieDetailsFuture,
+                    builder: (context, movieSnapshot) {
+                      if (movieSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[400]!,
+                          child: Container(
+                            width: double.infinity,
+                            height: 40,
+                            color: Colors.grey[600],
+                          ),
+                        );
+                      } else if (movieSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${movieSnapshot.error}'));
+                      } else if (!movieSnapshot.hasData) {
+                        return const Center(
+                            child: Text('No movie details found'));
+                      }
+
+                      final movie = movieSnapshot.data!;
+
+                      return Row(
                         children: [
                           // Likes and Dislikes
                           Container(
@@ -405,130 +520,157 @@ class _FilmDetailsState extends State<FilmDetails> {
                             ),
                           ),
                         ],
-                      ),
+                      );
+                    },
+                  ),
 
-                      // Cast & Crew (if applicable)
-                      const SizedBox(height: 30.0),
-                      const Text(
-                        "Cast & Crew",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10.0),
-                      FutureBuilder<List<Cast>>(
-                          future: _castFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child:
-                                    // Shimmer Loading Effect
-                                    SizedBox(
-                                  height: 150.0,
-                                  child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: 5,
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 20.0),
-                                          child: Column(
-                                            children: [
-                                              Shimmer.fromColors(
-                                                baseColor: Colors.grey[300]!,
-                                                highlightColor:
-                                                    Colors.grey[400]!,
-                                                child: Container(
-                                                  height: 80.0,
-                                                  width: 80.0,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.grey[600],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }),
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('Error: ${snapshot.error}'));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return const Center(
-                                  child: Text('No cast details found'));
-                            }
-
-                            final castList = snapshot.data!;
-
-                            return SizedBox(
+                  // Cast & Crew (if applicable)
+                  const SizedBox(height: 30.0),
+                  const Text(
+                    "Cast & Crew",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10.0),
+                  FutureBuilder<List<Cast>>(
+                      future: _castFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child:
+                                // Shimmer Loading Effect
+                                SizedBox(
                               height: 150.0,
                               child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: castList.length,
-                                itemBuilder: (context, index) {
-                                  final cast = castList[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 20.0),
-                                    child: Column(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            // Open Cast Details
-                                            Get.to(() =>
-                                                ActorProfile(actorId: cast.id));
-                                          },
-                                          child: Container(
-                                            height: 80.0,
-                                            width: 80.0,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  'https://image.tmdb.org/t/p/w500${cast.profilePath}',
-                                                ),
-                                                fit: BoxFit.cover,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: 5,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 20.0),
+                                      child: Column(
+                                        children: [
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey[300]!,
+                                            highlightColor: Colors.grey[400]!,
+                                            child: Container(
+                                              height: 80.0,
+                                              width: 80.0,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.grey[600],
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 5.0),
-                                        Text(
-                                          cast.knownForDepartment,
-                                          style: const TextStyle(
-                                              color: Color.fromARGB(
-                                                  255, 202, 202, 202)),
-                                        ),
-                                        Text(
-                                          cast.originalName,
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          }),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return const Center(
+                              child: Text('No cast details found'));
+                        }
 
-                      // Audio Track & Subtitle (if applicable)
-                      const SizedBox(height: 20.0),
-                      const Text(
-                        "Audio Track & Subtitle",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Row(
+                        final castList = snapshot.data!;
+
+                        return SizedBox(
+                          height: 150.0,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: castList.length,
+                            itemBuilder: (context, index) {
+                              final cast = castList[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 20.0),
+                                child: Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Open Cast Details
+                                        Get.to(() =>
+                                            ActorProfile(actorId: cast.id));
+                                      },
+                                      child: Container(
+                                        height: 80.0,
+                                        width: 80.0,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                            image: NetworkImage(
+                                              'https://image.tmdb.org/t/p/w500${cast.profilePath}',
+                                            ),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5.0),
+                                    Text(
+                                      cast.knownForDepartment,
+                                      style: const TextStyle(
+                                          color: Color.fromARGB(
+                                              255, 202, 202, 202)),
+                                    ),
+                                    Text(
+                                      cast.originalName,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }),
+
+                  const SizedBox(height: 20.0),
+                  const Text(
+                    "Audio Track & Subtitle",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10.0),
+                  FutureBuilder<Movie>(
+                    future: _movieDetailsFuture,
+                    builder: (context, movieSnapshot) {
+                      if (movieSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[400]!,
+                          child: Container(
+                            width: double.infinity,
+                            height: 40,
+                            color: Colors.grey[600],
+                          ),
+                        );
+                      } else if (movieSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${movieSnapshot.error}'));
+                      } else if (!movieSnapshot.hasData) {
+                        return const Center(
+                            child: Text('No movie details found'));
+                      }
+
+                      final movie = movieSnapshot.data!;
+
+                      final spokenLanguages = movie.spokenLanguages;
+
+                      return Column(
                         children: [
+                          // Audio Track Section
                           Container(
                             height: 40.0,
                             padding: const EdgeInsets.symmetric(
@@ -539,23 +681,21 @@ class _FilmDetailsState extends State<FilmDetails> {
                             ),
                             child: Row(
                               children: [
-                                Text("${movie.voteCount}",
-                                    style:
-                                        const TextStyle(color: Colors.white)),
-                                const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 5.0),
-                                  child: VerticalDivider(
-                                    color: Colors.white,
-                                    thickness: 0.6,
-                                  ),
+                                const Icon(Icons.volume_up,
+                                    color: Colors.white, size: 16.0),
+                                const SizedBox(width: 8.0),
+                                Text(
+                                  spokenLanguages.isNotEmpty
+                                      ? spokenLanguages[0]
+                                          .englishName // Display the first language
+                                      : "N/A",
+                                  style: const TextStyle(color: Colors.white),
                                 ),
-                                const Text("Hindi",
-                                    style: TextStyle(color: Colors.white)),
                               ],
                             ),
                           ),
-                          const Spacer(),
+                          const SizedBox(height: 20.0),
+                          // Subtitle Section
                           Container(
                             height: 40.0,
                             padding: const EdgeInsets.symmetric(
@@ -564,80 +704,70 @@ class _FilmDetailsState extends State<FilmDetails> {
                               color: const Color.fromARGB(255, 45, 36, 58),
                               borderRadius: BorderRadius.circular(50.0),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Text("Subtitle",
-                                    style: TextStyle(color: Colors.white)),
-                                Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 5.0),
-                                  child: VerticalDivider(
-                                    color: Colors.white,
-                                    thickness: 0.6,
-                                  ),
+                                const Icon(Icons.subtitles,
+                                    color: Colors.white, size: 16.0),
+                                const SizedBox(width: 8.0),
+                                Text(
+                                  spokenLanguages.isNotEmpty
+                                      ? spokenLanguages
+                                          .map((lang) => lang.englishName)
+                                          .join(", ") // Display all languages
+                                      : "N/A",
+                                  style: const TextStyle(color: Colors.white),
                                 ),
-                                Text("Hindi",
-                                    style: TextStyle(color: Colors.white)),
                               ],
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 40.0),
-                      FutureBuilder<List<Review>>(
-                        future: _reviewsFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return const Center(
-                                child: Text('No reviews found'));
-                          }
-
-                          return ReviewsSection(reviews: snapshot.data!);
-                        },
-                      ),
-                      // Related Movies
-                      const SizedBox(height: 20.0),
-                      const Text(
-                        "Related Movies",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10.0),
-                      FutureBuilder<List<Movie>>(
-                        future: _similarMovies,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return const Center(child: Text('No movies found'));
-                          }
-
-                          return RelatedMovies(movies: snapshot.data!);
-                        },
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                ),
-              ],
+                  const SizedBox(height: 40.0),
+                  FutureBuilder<List<Review>>(
+                    future: _reviewsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('No reviews found'));
+                      }
+
+                      return ReviewsSection(reviews: snapshot.data!);
+                    },
+                  ),
+                  // Related Movies
+                  const SizedBox(height: 20.0),
+                  const Text(
+                    "Related Movies",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10.0),
+                  FutureBuilder<List<Movie>>(
+                    future: _similarMovies,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('No movies found'));
+                      }
+
+                      return RelatedMovies(movies: snapshot.data!);
+                    },
+                  ),
+                ],
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

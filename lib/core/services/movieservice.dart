@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:movie_magic/core/utils/constants.dart';
+import 'package:movie_magic/models/actor.dart';
 import 'package:movie_magic/models/cast.dart';
 import 'package:movie_magic/models/movie.dart';
 import 'package:movie_magic/models/reviews.dart';
@@ -44,6 +45,40 @@ class MovieService {
             .cast<String>();
       } else {
         throw Exception('Failed to load movie images');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<String>> fetchActorImages(int actorId) async {
+    try {
+      final response = await _dio.get(
+        '${Constants.baseUrl}${Constants.actorImagesEndpoint}'
+            .replaceAll('{person_id}', actorId.toString()),
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> profiles = response.data['profiles'];
+        return profiles.map((json) => json['file_path'] as String).toList();
+      } else {
+        throw Exception('Failed to load actor images');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<ActorDetails> fetchActorDetails(int actorId) async {
+    try {
+      final response = await _dio.get(
+        '${Constants.baseUrl}${Constants.actorDetailsEndpoint}'
+            .replaceAll('{person_id}', actorId.toString()),
+      );
+
+      if (response.statusCode == 200) {
+        return ActorDetails.fromJson(response.data);
+      } else {
+        throw Exception('Failed to load actor details');
       }
     } catch (e) {
       throw Exception('Error: $e');

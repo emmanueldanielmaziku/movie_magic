@@ -3,6 +3,8 @@ class Constants {
   static const String trendingMoviesEndpoint = '/trending/movie/day';
   static const String popularMoviesEndpoint = '/movie/popular';
   static const String movieImagesEndpoint = '/movie/{movie_id}/images';
+  static const String actorImagesEndpoint = '/person/{person_id}/images';
+  static const String actorDetailsEndpoint = '/person/{person_id}';
   static const String movieDetailsEndpoint = '/movie/{movie_id}';
   static const String castCrewEndpoint = '/movie/{movie_id}/credits';
   static const String similarMoviesEndpoint = '/movie/{movie_id}/similar';
