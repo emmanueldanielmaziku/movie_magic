@@ -4,6 +4,11 @@ A simple movie streaming app built with Flutter and Firebase, using The Movie Da
 
 ---
 
+#### **Download APK**:
+[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen)](https://github.com/emmanueldanielmaziku/movie_magic/releases/download/v1.0.0-beta/Base.apk)
+
+---
+
 ## Features
 
 ✅ **Google Authentication (Firebase)**  
