@@ -1,11 +1,10 @@
-// ignore_for_file: null_argument_to_non_null_type, unrelated_type_equality_checks
+// ignore_for_file: null_argument_to_non_null_type
 
-import 'dart:io'; // For InternetAddress.lookup
+import 'dart:io';
 import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movie_magic/core/services/movieservice.dart';
@@ -24,37 +23,17 @@ class ActorProfile extends StatefulWidget {
 }
 
 class _ActorProfileState extends State<ActorProfile> {
-  int _currentIndex = 0;
   bool internetStatus = false;
-  final CarouselSliderController _controller = CarouselSliderController();
 
   Future<bool> checkInternetStatus() async {
     var connectivityResult = await Connectivity().checkConnectivity();
-
     if (connectivityResult.contains(ConnectivityResult.none)) {
-      if (kDebugMode) {
-        print("No network connection");
-      }
       return false;
     }
-
     try {
       final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        if (kDebugMode) {
-          print("Internet access available");
-        }
-        return true;
-      } else {
-        if (kDebugMode) {
-          print("No internet access");
-        }
-        return false;
-      }
-    } on SocketException catch (e) {
-      if (kDebugMode) {
-        print("Error checking internet access: $e");
-      }
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
       return false;
     }
   }
@@ -69,21 +48,21 @@ class _ActorProfileState extends State<ActorProfile> {
   @override
   void initState() {
     super.initState();
-    _checkInternetAndUpdate(); // Initial check for internet status
+    _checkInternetAndUpdate();
   }
 
   @override
   Widget build(BuildContext context) {
-    late final Future<List<String>> images = internetStatus
+    final Future<List<String>> images = internetStatus
         ? MovieService().fetchActorImages(widget.actorId)
         : Future.value([]);
-    late final Future<ActorDetails> actorDetails = internetStatus
+    final Future<ActorDetails> actorDetails = internetStatus
         ? MovieService().fetchActorDetails(widget.actorId)
         : Future.value(null);
-    late final Future<ActorDetails> actorQuickFacts = internetStatus
+    final Future<ActorDetails> actorQuickFacts = internetStatus
         ? MovieService().fetchActorDetails(widget.actorId)
         : Future.value(null);
-    late final Future<List<Filmography>> filmography = internetStatus
+    final Future<List<Filmography>> filmography = internetStatus
         ? MovieService().fetchActorMovieCredits(widget.actorId)
         : Future.value([]);
 
@@ -93,7 +72,6 @@ class _ActorProfileState extends State<ActorProfile> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Carousel Section
                   FutureBuilder<List<String>>(
                     future: images,
                     builder: (context, snapshot) {
@@ -120,106 +98,9 @@ class _ActorProfileState extends State<ActorProfile> {
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return const Center(child: Text('No images found'));
                       }
-
-                      final imageUrls = snapshot.data!;
-
-                      return Stack(
-                        children: [
-                          CarouselSlider(
-                            carouselController: _controller,
-                            options: CarouselOptions(
-                              height: 300,
-                              autoPlay: true,
-                              viewportFraction: 1.0,
-                              onPageChanged: (index, reason) {
-                                setState(() {
-                                  _currentIndex = index;
-                                });
-                              },
-                            ),
-                            items: imageUrls.map((imageUrl) {
-                              return Container(
-                                height: 320,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                        'https://image.tmdb.org/t/p/w780$imageUrl'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                          Positioned(
-                            top: 30.0,
-                            left: 20.0,
-                            child: GestureDetector(
-                              onTap: () {
-                                Get.back();
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Center(
-                                    child: Icon(
-                                      CupertinoIcons.back,
-                                      color: Colors.white,
-                                      size: 22.0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            right: 20.0,
-                            bottom: 30.0,
-                            child: AnimatedSmoothIndicator(
-                              activeIndex: _currentIndex,
-                              count: imageUrls.length,
-                              effect: const WormEffect(
-                                dotHeight: 8,
-                                dotWidth: 8,
-                                activeDotColor: Colors.white,
-                              ),
-                              onDotClicked: (index) {
-                                _controller.animateToPage(index);
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 30.0,
-                            left: 20.0,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  height: 30.0,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15.0, vertical: 5.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: const Text(
-                                    "70 IMDb",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 14.0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
+                      return ActorImageCarousel(imageUrls: snapshot.data!);
                     },
                   ),
-                  // Actor Details Section
                   FutureBuilder<ActorDetails>(
                     future: actorDetails,
                     builder: (context, snapshot) {
@@ -234,7 +115,6 @@ class _ActorProfileState extends State<ActorProfile> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Shimmer for Role and Date of Birth
                               Shimmer.fromColors(
                                 baseColor: Colors.grey[850]!,
                                 highlightColor: Colors.grey[800]!,
@@ -262,7 +142,6 @@ class _ActorProfileState extends State<ActorProfile> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              // Shimmer for Actor Name
                               Shimmer.fromColors(
                                 baseColor: Colors.grey[850]!,
                                 highlightColor: Colors.grey[800]!,
@@ -276,7 +155,6 @@ class _ActorProfileState extends State<ActorProfile> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              // Shimmer for Biography
                               Shimmer.fromColors(
                                 baseColor: Colors.grey[850]!,
                                 highlightColor: Colors.grey[800]!,
@@ -317,19 +195,16 @@ class _ActorProfileState extends State<ActorProfile> {
                         );
                       } else if (snapshot.hasError) {
                         return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData) {
+                      } else if (!snapshot.hasData || snapshot.data == null) {
                         return const Center(
                             child: Text('No actor details found'));
                       }
-
                       final actor = snapshot.data!;
-
                       return Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Role and Date of Birth in a Row
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -351,7 +226,6 @@ class _ActorProfileState extends State<ActorProfile> {
                               ],
                             ),
                             const SizedBox(height: 16),
-                            // Actor Name
                             Text(
                               actor.name,
                               style: const TextStyle(
@@ -360,7 +234,6 @@ class _ActorProfileState extends State<ActorProfile> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // Biography
                             Text(
                               actor.biography,
                               style: const TextStyle(
@@ -373,7 +246,6 @@ class _ActorProfileState extends State<ActorProfile> {
                       );
                     },
                   ),
-                  // Filmography Section
                   FutureBuilder<List<Filmography>>(
                     future: filmography,
                     builder: (context, snapshot) {
@@ -391,7 +263,6 @@ class _ActorProfileState extends State<ActorProfile> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Shimmer for Filmography Title
                                 Container(
                                   width: 150,
                                   height: 20,
@@ -401,12 +272,11 @@ class _ActorProfileState extends State<ActorProfile> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                // Shimmer for Movie List
                                 SizedBox(
                                   height: 220,
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
-                                    itemCount: 5, // Placeholder count
+                                    itemCount: 5,
                                     itemBuilder: (context, index) {
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -414,7 +284,6 @@ class _ActorProfileState extends State<ActorProfile> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            // Shimmer for Movie Poster
                                             Container(
                                               width: 300,
                                               height: 160,
@@ -425,7 +294,6 @@ class _ActorProfileState extends State<ActorProfile> {
                                               ),
                                             ),
                                             const SizedBox(height: 8),
-                                            // Shimmer for Movie Title
                                             Container(
                                               width: 150,
                                               height: 16,
@@ -436,7 +304,6 @@ class _ActorProfileState extends State<ActorProfile> {
                                               ),
                                             ),
                                             const SizedBox(height: 4),
-                                            // Shimmer for Release Date
                                             Container(
                                               width: 100,
                                               height: 14,
@@ -462,9 +329,7 @@ class _ActorProfileState extends State<ActorProfile> {
                         return const Center(
                             child: Text('No movie credits found'));
                       }
-
                       final movies = snapshot.data!;
-
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -480,7 +345,6 @@ class _ActorProfileState extends State<ActorProfile> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                // View All Button
                                 TextButton(
                                   onPressed: () {},
                                   child: const Icon(
@@ -551,7 +415,6 @@ class _ActorProfileState extends State<ActorProfile> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    // Movie Title
                                                     Wrap(
                                                       children: [
                                                         const Text(
@@ -613,8 +476,6 @@ class _ActorProfileState extends State<ActorProfile> {
                           ),
                         ),
                       ),
-
-                      // Actor Details Section
                       FutureBuilder<ActorDetails>(
                         future: actorQuickFacts,
                         builder: (context, snapshot) {
@@ -630,7 +491,6 @@ class _ActorProfileState extends State<ActorProfile> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Shimmer for Role, Date of Birth, and Place of Birth
                                   Shimmer.fromColors(
                                     baseColor: Colors.grey[850]!,
                                     highlightColor: Colors.grey[800]!,
@@ -677,9 +537,7 @@ class _ActorProfileState extends State<ActorProfile> {
                             return const Center(
                                 child: Text('No actor details found'));
                           }
-
                           final actor = snapshot.data!;
-
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20.0, vertical: 10),
@@ -720,6 +578,116 @@ class _ActorProfileState extends State<ActorProfile> {
           : NoInternetWidget(
               onRetry: _checkInternetAndUpdate,
             ),
+    );
+  }
+}
+
+class ActorImageCarousel extends StatefulWidget {
+  final List<String> imageUrls;
+  const ActorImageCarousel({super.key, required this.imageUrls});
+
+  @override
+  State<ActorImageCarousel> createState() => _ActorImageCarouselState();
+}
+
+class _ActorImageCarouselState extends State<ActorImageCarousel> {
+  int _currentIndex = 0;
+  final CarouselSliderController _controller = CarouselSliderController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        CarouselSlider(
+          carouselController: _controller,
+          options: CarouselOptions(
+            height: 300,
+            autoPlay: true,
+            viewportFraction: 1.0,
+            onPageChanged: (index, reason) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+          items: widget.imageUrls.map((imageUrl) {
+            return Container(
+              height: 320,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                image: DecorationImage(
+                  image:
+                      NetworkImage('https://image.tmdb.org/t/p/w780$imageUrl'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        Positioned(
+          top: 30.0,
+          left: 20.0,
+          child: GestureDetector(
+            onTap: () {
+              Get.back();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                shape: BoxShape.circle,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(
+                  child: Icon(
+                    CupertinoIcons.back,
+                    color: Colors.white,
+                    size: 22.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          right: 20.0,
+          bottom: 30.0,
+          child: AnimatedSmoothIndicator(
+            activeIndex: _currentIndex,
+            count: 5,
+            effect: const WormEffect(
+              dotHeight: 8,
+              dotWidth: 8,
+              activeDotColor: Colors.white,
+            ),
+            onDotClicked: (index) {
+              _controller.animateToPage(index);
+            },
+          ),
+        ),
+        Positioned(
+          bottom: 30.0,
+          left: 20.0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 30.0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: const Text(
+                  "70 IMDb",
+                  style: TextStyle(color: Colors.white, fontSize: 14.0),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

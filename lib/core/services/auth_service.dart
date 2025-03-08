@@ -4,14 +4,30 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Sign in with google
   Future<User?> signInWithGoogle() async {
     try {
+      // Sign out from Google Sign-In to force account selection
+      await _googleSignIn.signOut();
+
+      // Clearing the cached account
+      await _googleSignIn.signInSilently().then((account) {
+        if (account != null) {
+          _googleSignIn.disconnect();
+        }
+      });
+
+      // Initiating the Google Sign-In process
       final GoogleSignInAccount? googleSignInAccount =
-          await GoogleSignIn().signIn();
+          await _googleSignIn.signIn();
+      if (googleSignInAccount == null) {
+        return null;
+      }
+
       final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount!.authentication;
+          await googleSignInAccount.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleSignInAuthentication.accessToken,
         idToken: googleSignInAuthentication.idToken,
@@ -30,7 +46,8 @@ class AuthService {
 
   Future<void> signOut() async {
     try {
-      await FirebaseAuth.instance.signOut();
+      await _firebaseAuth.signOut();
+      await _googleSignIn.signOut();
     } catch (e) {
       if (kDebugMode) {
         print("Error signing out: $e");
