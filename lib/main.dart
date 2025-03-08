@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movie_magic/core/services/auth_checker.dart';
+import 'core/services/connection_service.dart';
 import 'firebase_options.dart';
 import 'models/movie.dart';
 import 'models/nowplaying.dart';
@@ -57,6 +58,9 @@ class MovieMagic extends StatelessWidget {
         ),
       ),
       home: const AuthChecker(),
+      initialBinding: BindingsBuilder(() {
+        Get.put(ConnectivityService());
+      }),
     );
   }
 }

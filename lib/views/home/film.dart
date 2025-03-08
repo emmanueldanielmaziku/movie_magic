@@ -53,8 +53,7 @@ class _FilmDetailsState extends State<FilmDetails> {
                       height: 320,
                       decoration: BoxDecoration(
                         color: Colors.grey[850]!,
-                        borderRadius:
-                            BorderRadius.circular(20.0), // Border radius
+                        borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
                   );
