@@ -1,3 +1,7 @@
+import 'package:hive/hive.dart';
+
+part 'movie.g.dart';
+
 class SpokenLanguage {
   final String englishName;
   final String iso6391;
@@ -18,16 +22,36 @@ class SpokenLanguage {
   }
 }
 
+@HiveType(typeId: 0)
 class Movie {
+  @HiveField(0)
   final int id;
+
+  @HiveField(1)
   final String title;
+
+  @HiveField(2)
   final String overview;
+
+  @HiveField(3)
   final String posterPath;
+
+  @HiveField(4)
   final double voteAverage;
+
+  @HiveField(5)
   final List<String> genres;
+
+  @HiveField(6)
   final int runtime;
+
+  @HiveField(7)
   final String releaseDate;
+
+  @HiveField(8)
   final int voteCount;
+
+  @HiveField(9)
   final List<SpokenLanguage> spokenLanguages;
 
   Movie({

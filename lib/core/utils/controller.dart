@@ -28,12 +28,16 @@ class _ControllerState extends State<Controller> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: _screens[selectedScreen],
       bottomNavigationBar: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
-            color: Colors.transparent,
-            border: Border(top: BorderSide(width: 0.5, color: Colors.grey))),
+          color: Colors.transparent,
+          border: Border(
+            top: BorderSide(width: 0.5, color: Colors.grey),
+          ),
+        ),
         child: NavBar(
           onDestinationSelected: (index) {
             screenController(index);

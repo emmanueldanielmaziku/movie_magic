@@ -11,15 +11,19 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.symmetric(horizontal: 3.0),
-      decoration:
-          BoxDecoration(border: Border.all(width: 0.2, color: Colors.black12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(right: 15.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(
+              width: 0.2,
+              color: const Color.fromARGB(216, 82, 82, 82),
+            ),
+          ),
+          child: Stack(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.0),
@@ -81,8 +85,8 @@ class MovieCard extends StatelessWidget {
               )
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

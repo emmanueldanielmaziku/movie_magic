@@ -183,7 +183,10 @@ class _HomeState extends State<Home> {
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(() =>
+                              FilmDetails(movieId: movies[_currentIndex].id));
+                        },
                         child: const Center(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -208,7 +211,7 @@ class _HomeState extends State<Home> {
             // Trending Movies Section
             Padding(
               padding: const EdgeInsets.only(
-                  left: 16.0, top: 30.0, bottom: 20.0, right: 10.0),
+                  left: 16.0, bottom: 20.0, top: 30.0, right: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -247,7 +250,7 @@ class _HomeState extends State<Home> {
             // Upcoming Movies Section
             Padding(
               padding: const EdgeInsets.only(
-                  left: 16.0, top: 30.0, bottom: 20.0, right: 10.0),
+                  left: 16.0, top: 10.0, bottom: 20.0, right: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -282,6 +285,8 @@ class _HomeState extends State<Home> {
                 return TrendMovieSection(movies: snapshot.data!);
               },
             ),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -355,6 +360,7 @@ class _HomeState extends State<Home> {
           itemBuilder: (context, index) {
             return Container(
               width: 150,
+              height: 220,
               margin: const EdgeInsets.only(left: 15),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
