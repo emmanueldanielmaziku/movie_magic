@@ -18,7 +18,7 @@ class NavBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
         child: BottomNavigationBar(
-          backgroundColor: Colors.black.withOpacity(0.1),
+          backgroundColor: Colors.black.withOpacity(0.8),
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           currentIndex: selectedIndex,

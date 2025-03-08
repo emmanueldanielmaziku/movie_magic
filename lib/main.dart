@@ -2,8 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movie_magic/core/services/auth_checker.dart';
 import 'firebase_options.dart';
+import 'models/movie.dart';
+import 'models/nowplaying.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +27,12 @@ void main() async {
       statusBarIconBrightness: Brightness.light,
     ),
   );
-
+  await Hive.initFlutter();
+  Hive.registerAdapter(MovieAdapter());
+  Hive.registerAdapter(NowPlayingAdapter());
+  await Hive.openBox<Movie>('trendingMoviesBox');
+  await Hive.openBox<NowPlaying>('playingMoviesBox');
+  await Hive.openBox<Movie>('upcomingMoviesBox');
   runApp(const MovieMagic());
 }
 

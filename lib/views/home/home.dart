@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,8 @@ import 'package:movie_magic/models/movie.dart';
 import 'package:movie_magic/models/nowplaying.dart';
 import 'package:movie_magic/views/home/film.dart';
 import 'package:movie_magic/widgets/moviecard.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -34,12 +35,11 @@ class _HomeState extends State<Home> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Now Playing Movies Carousel
             FutureBuilder<List<NowPlaying>>(
               future: _nowPlayingMoviesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return _buildShimmerCarousel(); // Shimmer effect for carousel
+                  return _buildShimmerCarousel();
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -65,15 +65,40 @@ class _HomeState extends State<Home> {
                       items: movies.map((movie) {
                         return Stack(
                           children: [
-                            Container(
-                              height: 320,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.0),
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    'https://image.tmdb.org/t/p/w780${movie.backdropPath}',
+                            CachedNetworkImage(
+                              imageUrl:
+                                  'https://image.tmdb.org/t/p/w780${movie.backdropPath}',
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                height: 320,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
                                   ),
-                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey[850]!,
+                                highlightColor: Colors.grey[800]!,
+                                child: Container(
+                                  height: 320,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    color: Colors.grey[850],
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                height: 320,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.grey[850],
+                                ),
+                                child: const Icon(
+                                  Icons.error,
+                                  color: Colors.red,
                                 ),
                               ),
                             ),
@@ -236,7 +261,7 @@ class _HomeState extends State<Home> {
               future: _trendingMoviesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return _buildShimmerTrendingMovies(); // Shimmer effect for trending movies
+                  return _buildShimmerTrendingMovies();
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -275,7 +300,7 @@ class _HomeState extends State<Home> {
               future: _upcomingMoviesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return _buildShimmerTrendingMovies(); // Shimmer effect for upcoming movies
+                  return _buildShimmerTrendingMovies();
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

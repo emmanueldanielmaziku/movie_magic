@@ -475,7 +475,7 @@ class _ActorProfileState extends State<ActorProfile> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               // Movie Title
-                                              Row(
+                                              Wrap(
                                                 children: [
                                                   const Text(
                                                     "Role - ",

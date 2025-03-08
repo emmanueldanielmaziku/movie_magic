@@ -1,11 +1,31 @@
+import 'package:hive/hive.dart';
+
+part 'nowplaying.g.dart';
+
+@HiveType(typeId: 1)
 class NowPlaying {
+  @HiveField(0)
   final int id;
+
+  @HiveField(1)
   final String title;
+
+  @HiveField(2)
   final String overview;
+
+  @HiveField(3)
   final String posterPath;
+
+  @HiveField(4)
   final String backdropPath;
+
+  @HiveField(5)
   final double voteAverage;
+
+  @HiveField(6)
   final List<int> genreIds;
+
+  @HiveField(7)
   final String releaseDate;
 
   NowPlaying({

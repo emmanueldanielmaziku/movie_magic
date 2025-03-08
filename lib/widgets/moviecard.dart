@@ -1,7 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:movie_magic/models/movie.dart';
 
 class MovieCard extends StatelessWidget {
@@ -27,13 +28,29 @@ class MovieCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.0),
-                child: Image.network(
-                  'https://image.tmdb.org/t/p/w500${movie.posterPath}',
+                child: CachedNetworkImage(
+                  imageUrl:
+                      'https://image.tmdb.org/t/p/w500${movie.posterPath}',
                   fit: BoxFit.cover,
                   height: 220,
                   width: 150,
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Colors.grey[850]!,
+                    highlightColor: Colors.grey[800]!,
+                    child: Container(
+                      color: Colors.grey[850],
+                      height: 220,
+                      width: 150,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  ),
                 ),
               ),
+
+              // Blurred title overlay at the bottom
               Positioned(
                 bottom: 0.0,
                 left: 0.0,
@@ -64,6 +81,7 @@ class MovieCard extends StatelessWidget {
                   ),
                 ),
               ),
+
               Positioned(
                 top: 5.0,
                 right: 5.0,
@@ -82,7 +100,7 @@ class MovieCard extends StatelessWidget {
                     size: 18.0,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

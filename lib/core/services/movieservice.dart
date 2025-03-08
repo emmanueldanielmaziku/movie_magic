@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
 import 'package:movie_magic/core/utils/constants.dart';
 import 'package:movie_magic/models/actor.dart';
 import 'package:movie_magic/models/cast.dart';
@@ -23,13 +24,32 @@ class MovieService {
       final response = await _dio.get(Constants.trendingMoviesEndpoint);
       if (response.statusCode == 200) {
         final List<dynamic> results = response.data['results'];
-        return results.map((json) => Movie.fromJson(json)).toList();
+        List<Movie> movies =
+            results.map((json) => Movie.fromJson(json)).toList();
+        await _saveMoviesToHive(movies);
+        return movies;
       } else {
         throw Exception('Failed to load trending movies');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      List<Movie> cachedMovies = await _getMoviesFromHive();
+      if (cachedMovies.isNotEmpty) {
+        return cachedMovies;
+      } else {
+        throw Exception('Error: $e');
+      }
     }
+  }
+
+  Future<void> _saveMoviesToHive(List<Movie> movies) async {
+    final moviesBox = Hive.box<Movie>('trendingMoviesBox');
+    await moviesBox.clear();
+    await moviesBox.addAll(movies);
+  }
+
+  Future<List<Movie>> _getMoviesFromHive() async {
+    final moviesBox = Hive.box<Movie>('trendingMoviesBox');
+    return moviesBox.values.toList();
   }
 
   Future<List<Movie>> fetchUpcomingMovies() async {
@@ -37,13 +57,32 @@ class MovieService {
       final response = await _dio.get(Constants.upcomingMoviesEndpoint);
       if (response.statusCode == 200) {
         final List<dynamic> results = response.data['results'];
-        return results.map((json) => Movie.fromJson(json)).toList();
+        List<Movie> movies =
+            results.map((json) => Movie.fromJson(json)).toList();
+        await _saveUpcomingMoviesToHive(movies);
+        return movies;
       } else {
-        throw Exception('Failed to load trending movies');
+        throw Exception('Failed to load upcoming movies');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      List<Movie> cachedMovies = await _getUpcomingMoviesFromHive();
+      if (cachedMovies.isNotEmpty) {
+        return cachedMovies;
+      } else {
+        throw Exception('Error: $e');
+      }
     }
+  }
+
+  Future<void> _saveUpcomingMoviesToHive(List<Movie> movies) async {
+    final upcomingMoviesBox = Hive.box<Movie>('upcomingMoviesBox');
+    await upcomingMoviesBox.clear();
+    await upcomingMoviesBox.addAll(movies);
+  }
+
+  Future<List<Movie>> _getUpcomingMoviesFromHive() async {
+    final upcomingMoviesBox = Hive.box<Movie>('upcomingMoviesBox');
+    return upcomingMoviesBox.values.toList();
   }
 
   //Movie Images
@@ -120,19 +159,37 @@ class MovieService {
 
   Future<List<NowPlaying>> fetchNowPlayingMovies() async {
     try {
-      final response = await _dio.get(Constants.trendingMoviesEndpoint);
+      final response = await _dio.get(Constants.nowPlayingEndpoint);
       if (response.statusCode == 200) {
         final List<dynamic> results = response.data['results'];
-        return results.map((json) => NowPlaying.fromJson(json)).toList();
+        List<NowPlaying> movies =
+            results.map((json) => NowPlaying.fromJson(json)).toList();
+        await _saveNowPlayingMoviesToHive(movies);
+        return movies;
       } else {
-        throw Exception('Failed to load Now Playing Movies');
+        throw Exception('Failed to load now playing movies');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      List<NowPlaying> cachedMovies = await _getNowPlayingMoviesFromHive();
+      if (cachedMovies.isNotEmpty) {
+        return cachedMovies;
+      } else {
+        throw Exception('Error: $e');
+      }
     }
   }
 
-  //Movie Details
+  Future<void> _saveNowPlayingMoviesToHive(List<NowPlaying> movies) async {
+    final nowPlayingMoviesBox = Hive.box<NowPlaying>('playingMoviesBox');
+    await nowPlayingMoviesBox.clear();
+    await nowPlayingMoviesBox.addAll(movies);
+  }
+
+  Future<List<NowPlaying>> _getNowPlayingMoviesFromHive() async {
+    final nowPlayingMoviesBox = Hive.box<NowPlaying>('playingMoviesBox');
+    return nowPlayingMoviesBox.values.toList();
+  }
+
   Future<Movie> fetchMovieDetails(int movieId) async {
     try {
       final response = await _dio.get(
