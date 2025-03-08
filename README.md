@@ -14,7 +14,7 @@ A simple movie streaming app built with Flutter and Firebase, using The Movie Da
 ✅ **Google Authentication (Firebase)**  
 ✅ **Browse popular movies from TMDb**  
 ✅ **View movie details and actors**  
-✅ **Offline support using Hive**  
+✅ **Offline support using Hive (Only the Home Screen)**  
 ✅ **Responsive UI inspired by Behance**
 
 ---
